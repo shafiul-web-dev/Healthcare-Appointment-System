@@ -1,4 +1,4 @@
-# Healthcare Appointment Booking API 🚀
+# Healthcare Appointment Booking API 
 
 ##  Overview
 This is a **Healthcare Appointment Booking API** built with **ASP.NET Core Web API & Entity Framework Core**. It allows patients to book appointments with doctors while handling validation, scheduling conflicts, and efficient data management.
