@@ -146,7 +146,7 @@ namespace HealthcareAPI.Controllers
 
 		// 🔹 Delete Appointment
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteAppointment(int id)
+		public async Task<IActionResult> CancelAppointment(int id)
 		{
 			var appointment = await _context.Appointments.FindAsync(id);
 			if (appointment == null)
@@ -154,9 +154,10 @@ namespace HealthcareAPI.Controllers
 				return NotFound(new { message = "Appointment not found" });
 			}
 
-			_context.Appointments.Remove(appointment);
+			appointment.Status = "Canceled";
 			await _context.SaveChangesAsync();
-			return Ok(new { message = "Appointment deleted successfully" });
+
+			return Ok(new { message = "Appointment marked as Canceled." });
 		}
 	}
 }
