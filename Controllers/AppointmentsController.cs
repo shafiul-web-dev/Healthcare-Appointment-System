@@ -99,6 +99,15 @@ namespace HealthcareAPI.Controllers
 				return BadRequest(new { message = "Invalid DoctorId or PatientId" });
 			}
 
+			// 🔹 Check if the doctor already has an appointment at the same time
+			var isDoctorBusy = await _context.Appointments.AnyAsync(a =>
+				a.DoctorId == appointmentDto.DoctorId && a.AppointmentDate == appointmentDto.AppointmentDate);
+
+			if (isDoctorBusy)
+			{
+				return BadRequest(new { message = "Doctor is already booked for this time." });
+			}
+
 			var appointment = new Appointment
 			{
 				DoctorId = appointmentDto.DoctorId,
@@ -120,6 +129,12 @@ namespace HealthcareAPI.Controllers
 			if (appointment == null)
 			{
 				return NotFound(new { message = "Appointment not found" });
+			}
+
+			// 🔹 Prevent updating past appointments
+			if (appointment.AppointmentDate < DateTime.Now)
+			{
+				return BadRequest(new { message = "Past appointments cannot be rescheduled." });
 			}
 
 			appointment.AppointmentDate = appointmentDto.AppointmentDate;
