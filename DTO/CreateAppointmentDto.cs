@@ -1,10 +1,19 @@
-﻿namespace Healthcare_Appointment_System.DTO
+﻿using HealthcareAPI.Validations;
+using System.ComponentModel.DataAnnotations;
+
+public class CreateAppointmentDto
 {
-	public class CreateAppointmentDto
-	{
-		public int DoctorId { get; set; }
-		public int PatientId { get; set; }
-		public DateTime AppointmentDate { get; set; }
-		public string Status { get; set; }
-	}
+	[Required(ErrorMessage = "DoctorId is required.")]
+	public int DoctorId { get; set; }
+
+	[Required(ErrorMessage = "PatientId is required.")]
+	public int PatientId { get; set; }
+
+	[Required(ErrorMessage = "Appointment Date is required.")]
+	[FutureDate(ErrorMessage = "Appointment date must be in the future.")]
+	public DateTime AppointmentDate { get; set; }
+
+	[Required(ErrorMessage = "Status is required.")]
+	[RegularExpression("Scheduled|Completed|Canceled", ErrorMessage = "Invalid status.")]
+	public string Status { get; set; }
 }
