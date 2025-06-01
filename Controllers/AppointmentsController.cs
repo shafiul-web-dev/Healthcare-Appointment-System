@@ -17,7 +17,7 @@ namespace HealthcareAPI.Controllers
 			_context = context;
 		}
 
-		// 🔹 Get All Appointments with Sorting, Filtering, and Pagination
+		
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<AppointmentDto>>> GetAppointments(
 			[FromQuery] string doctorSpecialization,
@@ -32,19 +32,19 @@ namespace HealthcareAPI.Controllers
 				.Include(a => a.Patient)
 				.AsQueryable();
 
-			// 🔹 Filtering by Doctor Specialization
+			
 			if (!string.IsNullOrEmpty(doctorSpecialization))
 			{
 				query = query.Where(a => a.Doctor.Specialization == doctorSpecialization);
 			}
 
-			// 🔹 Filtering by Appointment Status
+			
 			if (!string.IsNullOrEmpty(status))
 			{
 				query = query.Where(a => a.Status == status);
 			}
 
-			// 🔹 Sorting Logic
+			
 			query = sortBy switch
 			{
 				"doctorName" => sortDirection == "asc" ? query.OrderBy(a => a.Doctor.Name) : query.OrderByDescending(a => a.Doctor.Name),
@@ -52,7 +52,7 @@ namespace HealthcareAPI.Controllers
 				_ => query
 			};
 
-			// 🔹 Pagination
+			
 			var totalRecords = await query.CountAsync();
 			var appointments = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize)
 				.Select(a => new AppointmentDto
@@ -67,7 +67,7 @@ namespace HealthcareAPI.Controllers
 			return Ok(new { TotalRecords = totalRecords, PageNumber = pageNumber, PageSize = pageSize, Data = appointments });
 		}
 
-		// 🔹 Get Single Appointment by ID
+		
 		[HttpGet("{id}")]
 		public async Task<ActionResult<AppointmentDto>> GetAppointmentById(int id)
 		{
@@ -87,7 +87,7 @@ namespace HealthcareAPI.Controllers
 			return appointment == null ? NotFound(new { message = "Appointment not found" }) : Ok(appointment);
 		}
 
-		// 🔹 Create New Appointment
+		
 		[HttpPost]
 		public async Task<ActionResult<Appointment>> AddAppointment(CreateAppointmentDto appointmentDto)
 		{
@@ -99,7 +99,7 @@ namespace HealthcareAPI.Controllers
 				return BadRequest(new { message = "Invalid DoctorId or PatientId" });
 			}
 
-			// 🔹 Check if the doctor already has an appointment at the same time
+			
 			var isDoctorBusy = await _context.Appointments.AnyAsync(a =>
 				a.DoctorId == appointmentDto.DoctorId && a.AppointmentDate == appointmentDto.AppointmentDate);
 
@@ -121,7 +121,7 @@ namespace HealthcareAPI.Controllers
 			return CreatedAtAction(nameof(GetAppointmentById), new { id = appointment.Id }, appointment);
 		}
 
-		// 🔹 Update Appointment
+		
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateAppointment(int id, CreateAppointmentDto appointmentDto)
 		{
@@ -131,7 +131,7 @@ namespace HealthcareAPI.Controllers
 				return NotFound(new { message = "Appointment not found" });
 			}
 
-			// 🔹 Prevent updating past appointments
+			
 			if (appointment.AppointmentDate < DateTime.Now)
 			{
 				return BadRequest(new { message = "Past appointments cannot be rescheduled." });
@@ -144,7 +144,7 @@ namespace HealthcareAPI.Controllers
 			return Ok(new { message = "Appointment updated successfully" });
 		}
 
-		// 🔹 Delete Appointment
+		
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> CancelAppointment(int id)
 		{
